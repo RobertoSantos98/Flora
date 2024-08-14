@@ -5,6 +5,7 @@ import Welcome from '../pages/Welcome';
 import SignIn from '../pages/SignIn';
 import Menu from '../pages/Menu';
 import Formulario from '../pages/Formulario';
+import Splash from '../components/Splash';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,6 +13,12 @@ const Stack = createNativeStackNavigator();
 export default function Routes(){
     return(
         <Stack.Navigator>
+
+            <Stack.Screen
+                name="Splash"
+                component={Splash}
+                options={{headerShown: false}}
+                />
 
             <Stack.Screen
                 name="Welcome"
