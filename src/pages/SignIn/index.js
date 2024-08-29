@@ -1,16 +1,58 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
 import BotomSheet from '@gorhom/bottom-sheet'
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import userService from '../../UserServices'
 
 export default function Welcome() {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
   const bottomSheetref = useRef(null);
   const snapPoints = useMemo(() => ["15%", "70%" ], []);
+
+  
+  let button;
+    if(loading) {
+      button = 'Carregando';
+    } else {
+      button = 'Acessar'
+    }
+    
+
+  const handleSubmit = async () => {
+
+    const verificarUsuario = {
+      email: email,
+      password: password,
+    }
+
+    setLoading(true);
+
+    try{
+      const response = await userService.login(verificarUsuario);
+      console.log('Response do login', response);
+
+      if(response.token) {
+        alert('Usuario logado com sucesso!');
+        navigation.navigate("Menu");
+      } else {
+        alert('Falha no login. Verifique suas credenciais.')
+      }
+    } catch (error) {
+        alert('Algo deu errado: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   const renderHeader = () => (
     <View style={{alignItems:'center', paddingVertical: 10}} >
@@ -48,11 +90,11 @@ export default function Welcome() {
             <View  style={styles.Form} >
 
 
-            <TextInput placeholder='Digite o Usuário...' style={styles.input}/>
-            <TextInput placeholder='Digite a Senha...' style={styles.input}/>
+            <TextInput placeholder='Digite o Usuário...' style={styles.input} value={email} onChangeText={setEmail} />
+            <TextInput placeholder='Digite a Senha...' style={styles.input} value={password} onChangeText={setPassword}/>
 
-            <TouchableOpacity style={styles.button} onPress={ () => navigation.navigate('Menu')} >
-              <Text style={styles.buttonText}>Acessar</Text>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit} >
+              <Text style={styles.buttonText}>{button}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.buttonRegister} >
